@@ -618,7 +618,7 @@ main{position:relative}
             <div class="status-step">⛓ Confirm</div>
           </div>
           <div style="margin-top:24px;text-align:center">
-            <a class="btn btn-primary" data-nav="fetch" style="width:100%;justify-content:center">Run AI Audit</a>
+            <a class="btn btn-primary" id="runAuditBtn" style="width:100%;justify-content:center">Run AI Audit</a>
           </div>
         </div>
         <p class="lookup-note rise" style="margin-top:24px">Already have an Audit? <a data-nav="fetch" style="color:var(--accent);cursor:pointer;text-decoration:none">Fetch your report →</a></p>
@@ -1108,9 +1108,8 @@ if(dz){
 }
 
 /* ── upload button ── */
-document.querySelectorAll('[data-page="upload"] .btn-primary, [data-page="upload"] a.btn').forEach(btn=>{
-  btn.addEventListener('click', e=>{ e.preventDefault(); runUpload(); });
-});
+const runAuditBtn = document.getElementById('runAuditBtn');
+if(runAuditBtn) runAuditBtn.addEventListener('click', e=>{ e.preventDefault(); e.stopImmediatePropagation(); runUpload(); });
 
 /* ── fetch & verify buttons ── */
 const fetchBtn = document.getElementById('fetchBtn');
