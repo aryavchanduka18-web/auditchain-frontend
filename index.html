@@ -843,6 +843,18 @@ function moveInd(){
 
 function activate(page){
   if(!document.querySelector('.page[data-page="'+page+'"]')) page = 'home';
+
+  // Restore upload stage when navigating TO upload page
+  if(page === 'upload' && _originalUploadStage) {
+    const stage = document.querySelector('.upload-stage');
+    if(stage) {
+      stage.innerHTML = _originalUploadStage;
+      _uploadedFile = null;
+      // Re-wire drop zone and button after restoring HTML
+      rewireUploadPage();
+    }
+  }
+
   pages.forEach(p=>{
     const on = p.dataset.page === page;
     p.classList.toggle('active', on);
@@ -901,6 +913,9 @@ function heroFloat(){
 
 /* ── API CONFIG ── */
 const API_BASE = 'https://auditchain-backend-3o5r.onrender.com';
+
+/* ── SAVE ORIGINAL UPLOAD HTML (restore on each visit) ── */
+let _originalUploadStage = null;
 
 /* ── BACKEND BANNER ── */
 let _bannerTimeout;
@@ -1161,9 +1176,26 @@ const vTxInput  = document.getElementById('vTxHash');
 if(verifyBtn) verifyBtn.addEventListener('click', runVerify);
 if(vTxInput)  vTxInput.addEventListener('keydown', e=>{ if(e.key==='Enter') runVerify(); });
 
+/* ── REWIRE UPLOAD PAGE (called after restore) ── */
+function rewireUploadPage(){
+  const dz2 = document.getElementById('dropZone');
+  if(dz2){
+    dz2.addEventListener('dragover', e=>{ e.preventDefault(); dz2.style.borderColor='rgba(41,151,255,0.5)'; dz2.style.background='rgba(41,151,255,0.05)'; });
+    ['dragleave','drop'].forEach(ev=> dz2.addEventListener(ev, ()=>{ dz2.style.borderColor=''; dz2.style.background=''; }));
+    dz2.addEventListener('drop', e=>{ e.preventDefault(); const f=e.dataTransfer.files[0]; if(f&&f.name.endsWith('.sol')){ _uploadedFile=f; dz2.querySelector('.drop-main').textContent=f.name; } else if(f) alert('Please upload a .sol file.'); });
+    dz2.addEventListener('click', ()=>{ const inp=document.createElement('input'); inp.type='file'; inp.accept='.sol'; inp.onchange=e=>{ const f=e.target.files[0]; if(f){ _uploadedFile=f; dz2.querySelector('.drop-main').textContent=f.name; } }; inp.click(); });
+  }
+  const newBtn = document.getElementById('runAuditBtn');
+  if(newBtn) newBtn.addEventListener('click', e=>{ e.preventDefault(); e.stopImmediatePropagation(); runUpload(); });
+}
+
 /* ── BOOT ── */
 window.addEventListener('load', ()=>{
   setTimeout(()=>{
+    // Save original upload stage HTML before any modifications
+    const stage = document.querySelector('.upload-stage');
+    if(stage) _originalUploadStage = stage.innerHTML;
+
     document.getElementById('pageLoader').classList.add('hidden');
     moveInd();
     activate('home');
