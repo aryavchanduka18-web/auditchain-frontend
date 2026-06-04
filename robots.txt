@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://auditchain-app.netlify.app/sitemap.xml
