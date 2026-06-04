@@ -972,44 +972,75 @@ function clearStepTimers() {
 function runUpload(){
   if(!_uploadedFile){ alert('Please drop or select a .sol file first.'); return; }
 
-  // Show skeleton — user stays on Upload page
-  showUploadSkeleton();
+  showUploadSkeleton();  // show skeleton, clear simulated timers
 
   const formData = new FormData();
   formData.append('file', _uploadedFile);
 
   fetch(`${API_BASE}/api/audit/upload`, { method:'POST', body:formData, signal:AbortSignal.timeout(120000) })
-  .then(res => res.json().then(data => ({status:res.status, data})))
-  .then(({status, data}) => {
-    clearStepTimers();
-    if(status !== 200){
-      // Restore upload page on error
-      const stage = document.querySelector('.upload-stage');
-      if(stage) stage.innerHTML = `<div class="card rise shown" style="padding:36px"><div style="text-align:center;color:var(--red);font-size:15px;padding:32px">Upload failed: ${data.error||'Unknown error'}<br><br><button class="btn btn-primary" onclick="location.reload()" style="margin-top:16px">Try Again</button></div></div>`;
-      return;
+  .then(res => {
+    if(!res.ok || !res.body){ return res.json().then(d=>{ throw new Error(d.error||'Upload failed'); }); }
+    const reader  = res.body.getReader();
+    const decoder = new TextDecoder();
+    function read(){
+      reader.read().then(({ done, value }) => {
+        if(done) return;
+        const text  = decoder.decode(value, { stream: true });
+        const lines = text.split('\n').filter(l => l.startsWith('data:'));
+        for(const line of lines){
+          try { handleUploadEvent(JSON.parse(line.slice(5).trim())); } catch(e){}
+        }
+        read();
+      }).catch(()=>{});
     }
-    // Store fixed_code globally for the download button
-    window._lastFixedCode    = data.report && data.report.fixed_code ? data.report.fixed_code : null;
-    window._lastContractName = _uploadedFile ? _uploadedFile.name : 'contract.sol';
-
-    // Mark all steps done
-    ['ulStep1','ulStep2','ulStep3'].forEach(id => {
-      const el = document.getElementById(id);
-      if(el){ el.classList.remove('active'); el.classList.add('done'); }
-    });
-    // Brief pause to show all steps green, then redirect
-    setTimeout(() => {
-      const fi = document.getElementById('fetchInput');
-      if(fi) fi.value = data.txHash||'';
-      activate('fetch');
-      if(data.txHash) setTimeout(()=>runFetch(data.txHash), 300);
-    }, 800);
+    read();
   })
   .catch(e => {
     clearStepTimers();
     const stage = document.querySelector('.upload-stage');
-    if(stage) stage.innerHTML = `<div class="card rise shown" style="padding:36px"><div style="text-align:center;color:var(--red);font-size:15px;padding:32px">${e.name==='TimeoutError' ? 'Request timed out — backend may be starting up. Please retry.' : 'Connection error: '+e.message}<br><br><button class="btn btn-primary" onclick="location.reload()" style="margin-top:16px">Try Again</button></div></div>`;
+    if(stage) stage.innerHTML = `<div class="card rise shown" style="padding:36px"><div style="text-align:center;color:var(--red);font-size:15px;padding:32px">${e.name==='TimeoutError'?'Request timed out — backend starting up, please retry.':'Error: '+e.message}<br><br><button class="btn btn-primary" onclick="location.reload()" style="margin-top:16px">Try Again</button></div></div>`;
   });
+}
+
+function handleUploadEvent(data){
+  if(data.status === 'analyzing'){
+    // Step 1 already active — clear fake timers, use real events now
+    clearStepTimers();
+  } else if(data.status === 'storing'){
+    const s1=document.getElementById('ulStep1'), s2=document.getElementById('ulStep2');
+    if(s1){s1.classList.remove('active');s1.classList.add('done');}
+    if(s2) s2.classList.add('active');
+  } else if(data.status === 'anchoring'){
+    const s2=document.getElementById('ulStep2'), s3=document.getElementById('ulStep3');
+    if(s2){s2.classList.remove('active');s2.classList.add('done');}
+    if(s3) s3.classList.add('active');
+  } else if(data.status === 'done'){
+    // Store source code and contract name for on-demand fix
+    window._lastSourceCode   = data.sourceCode || null;
+    window._lastContractName = _uploadedFile ? _uploadedFile.name : 'contract.sol';
+    window._lastFixedCode    = null; // cleared — will be fetched on demand
+
+    ['ulStep1','ulStep2','ulStep3'].forEach(id=>{
+      const el=document.getElementById(id);
+      if(el){el.classList.remove('active');el.classList.add('done');}
+    });
+
+    // TX is submitted but not yet confirmed — wait 20s then fetch
+    const sub = document.querySelector('.ul-subtitle');
+    if(sub) sub.textContent = 'Transaction submitted. Fetching result in ~20 seconds...';
+
+    setTimeout(()=>{
+      const fi=document.getElementById('fetchInput');
+      if(fi) fi.value = data.txHash||'';
+      activate('fetch');
+      if(data.txHash) setTimeout(()=>runFetch(data.txHash), 300);
+    }, 20000);  // 20s — enough for Sepolia to confirm (~12-24s block time)
+
+  } else if(data.status === 'error'){
+    clearStepTimers();
+    const stage=document.querySelector('.upload-stage');
+    if(stage) stage.innerHTML=`<div class="card rise shown" style="padding:36px"><div style="text-align:center;color:var(--red);font-size:15px;padding:32px">Upload failed: ${data.error||'Unknown error'}<br><br><button class="btn btn-primary" onclick="location.reload()" style="margin-top:16px">Try Again</button></div></div>`;
+  }
 }
 
 /* ── FETCH FLOW ── */
@@ -1072,17 +1103,16 @@ function populateFetchResult(data){
   // Show download fix button if we have fixed_code from the last upload
   const fixBtn = document.getElementById('downloadFixBtn');
   const fixDisclaimer = document.getElementById('fixDisclaimer');
-  const fixedCode = window._lastFixedCode;
-  const contractName = window._lastContractName || 'contract_fixed.sol';
-  if(fixBtn && fixedCode){
-    fixBtn.style.display = 'inline-flex';
-    if(fixDisclaimer) fixDisclaimer.style.display = 'block';
-    fixBtn.onclick = () => downloadFixedCode(fixedCode, contractName);
-  } else if(fixBtn) {
-    // For manual fetches, offer to open IPFS which contains the full report with fixed_code
-    if(data.ipfsUrl){
+  if(fixBtn){
+    // Show fix button if we have source code from this session OR if there's an IPFS report
+    if(window._lastSourceCode){
       fixBtn.style.display = 'inline-flex';
-      fixBtn.textContent   = '📄 View Full Report (incl. Fix)';
+      if(fixDisclaimer) fixDisclaimer.style.display = 'block';
+      fixBtn.textContent = '⬇ Download Suggested Fix';
+      fixBtn.onclick = () => requestAndDownloadFix(window._lastSourceCode, window._lastContractName||'contract.sol');
+    } else if(data.ipfsUrl){
+      fixBtn.style.display = 'inline-flex';
+      fixBtn.textContent = '📄 View Full Report ↗';
       fixBtn.style.cssText += ';border-color:rgba(41,151,255,0.3);color:var(--accent)';
       fixBtn.onclick = () => window.open(data.ipfsUrl, '_blank');
     }
@@ -1091,14 +1121,33 @@ function populateFetchResult(data){
   result.style.display='block'; result.classList.add('show');
 }
 
+function requestAndDownloadFix(sourceCode, filename){
+  const fixBtn = document.getElementById('downloadFixBtn');
+  if(fixBtn){ fixBtn.textContent='⏳ Generating fix...'; fixBtn.style.pointerEvents='none'; }
+
+  fetch(`${API_BASE}/api/audit/fix`, {
+    method: 'POST',
+    headers: {'Content-Type':'application/json'},
+    body: JSON.stringify({ source_code: sourceCode, filename: filename }),
+    signal: AbortSignal.timeout(60000)
+  })
+  .then(r => r.json())
+  .then(data => {
+    if(data.fixed_code) downloadFixedCode(data.fixed_code, filename);
+    else alert('Fix generation failed. Try again.');
+  })
+  .catch(e => alert('Fix request failed: ' + e.message))
+  .finally(()=>{
+    if(fixBtn){ fixBtn.textContent='⬇ Download Suggested Fix'; fixBtn.style.pointerEvents=''; }
+  });
+}
+
 function downloadFixedCode(code, filename){
   const fixedName = filename.replace('.sol','') + '_fixed.sol';
   const blob = new Blob([code], {type:'text/plain'});
   const url  = URL.createObjectURL(blob);
   const a    = document.createElement('a');
-  a.href     = url;
-  a.download = fixedName;
-  a.click();
+  a.href=url; a.download=fixedName; a.click();
   URL.revokeObjectURL(url);
 }
 
