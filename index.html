@@ -1931,6 +1931,10 @@
       if (sub) sub.textContent = msg;
       if (badge) { badge.textContent = '✗ Not found'; badge.className = 'badge red'; }
       result.querySelectorAll('.result-item .value').forEach(v => { v.textContent = '—'; v.onclick = null; });
+      const _ob = document.getElementById('openReportBtn'); if (_ob) _ob.style.display = 'none';
+      const _fx = document.getElementById('downloadFixBtn'); if (_fx) _fx.style.display = 'none';
+      const _fi = document.getElementById('fetchInput');
+      ensureEtherscanBtn(result, (_fi && _TXRE.test(_fi.value.trim())) ? _fi.value.trim() : '', 'fetchEtherscanBtn');
       result.style.display = 'block'; result.classList.add('show');
     }
     function populateFetchResult(data) {
@@ -1957,6 +1961,7 @@
       if (dfSev) dfSev.textContent = data.severity || '—';
       if (dfStat) dfStat.textContent = data.verified ? 'Verified' : 'Unverified';
       ensureOpenReportBtn(result, (data.ipfsCID && data.ipfsUrl) ? data.ipfsUrl : '');
+      ensureEtherscanBtn(result, data.txHash || '', 'fetchEtherscanBtn');
       ensureFixButton(result);
       result.style.display = 'block'; result.classList.add('show');
     }
@@ -1981,6 +1986,15 @@
         b.textContent = 'Open Report ↗';
         b.style.display = 'inline-flex';
         b.onclick = () => window.open(url, '_blank');
+      } else if (b) { b.style.display = 'none'; }
+    }
+    function ensureEtherscanBtn(container, txHash, id) {
+      let b = document.getElementById(id);
+      if (txHash) {
+        if (!b) { b = document.createElement('button'); b.id = id; b.className = 'button button-ghost'; b.type = 'button'; b.style.marginTop = '16px'; b.style.marginRight = '10px'; container.appendChild(b); }
+        b.textContent = 'View on Sepolia Etherscan ↗';
+        b.style.display = 'inline-flex';
+        b.onclick = () => window.open('https://sepolia.etherscan.io/tx/' + txHash, '_blank');
       } else if (b) { b.style.display = 'none'; }
     }
     function requestAndDownloadFix(sourceCode, filename) {
@@ -2061,6 +2075,9 @@
         if (!k || !v) return;
         if (k.textContent.trim() === 'Status') v.textContent = data.verified ? 'Authentic' : 'Not verified';
       });
+      const _vi = document.getElementById('verifyInput');
+      const _vHash = data.txHash || (_vi && _TXRE.test(_vi.value.trim()) ? _vi.value.trim() : '');
+      ensureEtherscanBtn(result, _vHash, 'verifyEtherscanBtn');
       result.style.display = 'block'; result.classList.add('show');
     }
 
