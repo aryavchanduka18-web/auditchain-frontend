@@ -1901,18 +1901,25 @@
     }
 
     /* ---- Fetch ---- */
-    function runFetch(txHash) {
+    function runFetch(txHash, reportWin) {
       const input = document.getElementById('fetchInput');
       const btn = document.getElementById('fetchBtn');
       const hash = (txHash || (input ? input.value.trim() : '')).trim();
-      if (!hash) { if (input) input.focus(); return; }
-      if (!_TXRE.test(hash)) { if (input) input.focus(); showFetchError('Enter a valid 66-character transaction hash (0x…).'); return; }
+      const closeWin = () => { try { if (reportWin && !reportWin.closed) reportWin.close(); } catch (_) {} };
+      if (!hash) { closeWin(); if (input) input.focus(); return; }
+      if (!_TXRE.test(hash)) { closeWin(); if (input) input.focus(); showFetchError('Enter a valid 66-character transaction hash (0x…).'); return; }
       if (btn) { btn.disabled = true; btn.textContent = 'Working…'; }
       withBanner(
         fetch(API_BASE + '/api/fetch?tx=' + encodeURIComponent(hash), { signal: AbortSignal.timeout(15000) })
           .then(res => res.json().then(data => ({ status: res.status, data })))
-          .then(({ status, data }) => { if (status !== 200) { showFetchError(data.error || 'No audit record found for that hash.'); return; } populateFetchResult(data); })
-          .catch(e => showFetchError(e.name === 'TimeoutError' ? 'Timed out — the backend may be waking up. Try again.' : 'Connection error. Please try again.'))
+          .then(({ status, data }) => {
+            if (status !== 200) { closeWin(); showFetchError(data.error || 'No audit record found for that hash.'); return; }
+            populateFetchResult(data);
+            const url = (data.ipfsCID && data.ipfsUrl) ? data.ipfsUrl : '';
+            if (url && reportWin && !reportWin.closed) { reportWin.location.href = url; }
+            else closeWin();
+          })
+          .catch(e => { closeWin(); showFetchError(e.name === 'TimeoutError' ? 'Timed out — the backend may be waking up. Try again.' : 'Connection error. Please try again.'); })
           .finally(() => { if (btn) { btn.disabled = false; btn.textContent = 'Fetch Report'; } })
       );
     }
@@ -1942,13 +1949,14 @@
         else if (l === 'Severity') { val.textContent = data.severity || '—'; val.style.color = (data.severity === 'HIGH' || data.severity === 'CRITICAL') ? 'var(--orange)' : ''; }
         else if (l === 'Timestamp') { val.textContent = ts; }
         else if (l === 'IPFS CID') { val.textContent = data.ipfsCID || '—'; }
-        else if (l === 'Open report') { val.textContent = data.ipfsUrl || '—'; val.style.cursor = 'pointer'; val.title = 'Open report on IPFS'; val.onclick = () => data.ipfsUrl && window.open(data.ipfsUrl, '_blank'); }
+        else if (l === 'Open report') { val.textContent = data.ipfsUrl || '—'; if (data.ipfsCID && data.ipfsUrl) { val.style.cursor = 'pointer'; val.style.color = 'var(--cyan)'; val.style.textDecoration = 'underline'; val.title = 'Open report on IPFS'; val.onclick = () => window.open(data.ipfsUrl, '_blank'); } else { val.style.color = ''; val.style.textDecoration = ''; val.onclick = null; } }
       });
       const dfHash = document.getElementById('dfHash'), dfCid = document.getElementById('dfCid'), dfSev = document.getElementById('dfSeverity'), dfStat = document.getElementById('dfStatus');
       if (dfHash) dfHash.textContent = data.txHash ? (data.txHash.slice(0, 18) + '…' + data.txHash.slice(-3)) : '—';
       if (dfCid) dfCid.textContent = data.ipfsCID ? (data.ipfsCID.slice(0, 10) + '…') : '—';
       if (dfSev) dfSev.textContent = data.severity || '—';
       if (dfStat) dfStat.textContent = data.verified ? 'Verified' : 'Unverified';
+      ensureOpenReportBtn(result, (data.ipfsCID && data.ipfsUrl) ? data.ipfsUrl : '');
       ensureFixButton(result);
       result.style.display = 'block'; result.classList.add('show');
     }
@@ -1965,6 +1973,15 @@
         fixBtn.style.display = 'inline-flex';
         fixBtn.onclick = () => requestAndDownloadFix(window._lastSourceCode, window._lastContractName || 'contract.sol');
       } else if (fixBtn) { fixBtn.style.display = 'none'; }
+    }
+    function ensureOpenReportBtn(result, url) {
+      let b = document.getElementById('openReportBtn');
+      if (url) {
+        if (!b) { b = document.createElement('button'); b.id = 'openReportBtn'; b.className = 'button button-primary'; b.type = 'button'; b.style.marginTop = '16px'; b.style.marginRight = '10px'; result.appendChild(b); }
+        b.textContent = 'Open Report ↗';
+        b.style.display = 'inline-flex';
+        b.onclick = () => window.open(url, '_blank');
+      } else if (b) { b.style.display = 'none'; }
     }
     function requestAndDownloadFix(sourceCode, filename) {
       const fixBtn = document.getElementById('downloadFixBtn');
@@ -2052,8 +2069,14 @@
       const ra = document.getElementById('runAuditBtn');
       if (ra) ra.addEventListener('click', (e) => { e.preventDefault(); e.stopImmediatePropagation(); runUpload(); });
       const fb = document.getElementById('fetchBtn'), fi = document.getElementById('fetchInput');
-      if (fb) fb.addEventListener('click', () => runFetch());
-      if (fi) fi.addEventListener('keydown', (e) => { if (e.key === 'Enter') runFetch(); });
+      const _fetchFromUser = () => {
+        const v = fi ? fi.value.trim() : '';
+        let win = null;
+        if (_TXRE.test(v)) { try { win = window.open('', '_blank'); } catch (_) { win = null; } }
+        runFetch(undefined, win);
+      };
+      if (fb) fb.addEventListener('click', _fetchFromUser);
+      if (fi) fi.addEventListener('keydown', (e) => { if (e.key === 'Enter') _fetchFromUser(); });
       const vb = document.getElementById('verifyBtn'), vi = document.getElementById('verifyInput');
       if (vb) vb.addEventListener('click', () => runVerify());
       if (vi) vi.addEventListener('keydown', (e) => { if (e.key === 'Enter') runVerify(); });
