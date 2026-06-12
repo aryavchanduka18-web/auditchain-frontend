@@ -911,6 +911,128 @@
       .reveal, .reveal-left, .reveal-right { opacity:1 !important; transform:none !important; }
     }
   </style>
+
+  <!-- ════ Storytelling journey styles (imported from prototype, retuned to AuditChain tokens, namespaced acj- to avoid collisions) ════ -->
+  <style id="acj-styles">
+    .acj-journey { position:relative; height:560vh; }
+    .acj-pin { position:sticky; top:0; height:100dvh; overflow:hidden; }
+    .acj-pin::after { content:""; position:absolute; inset:0; z-index:30; pointer-events:none; background:radial-gradient(120% 95% at 50% 42%, transparent 58%, rgba(5,5,5,.55) 100%); }
+    .acj-head { position:absolute; left:50%; top:12vh; transform:translateX(-50%); width:min(820px, calc(100vw - 40px)); text-align:center; z-index:20; pointer-events:none; }
+    .acj-cap { position:absolute; inset:0; opacity:0; will-change:opacity, transform; }
+    .acj-kicker { display:block; font-family:var(--mono); font-size:.7rem; font-weight:500; letter-spacing:.22em; text-transform:uppercase; color:var(--muted2); margin-bottom:16px; }
+    .acj-cap h2 {
+      margin:0; font-family:var(--display); font-weight:700; letter-spacing:-.04em; line-height:1;
+      font-size:clamp(2rem,4.6vw,3.9rem);
+      background:linear-gradient(90deg,#ffffff 0%,#5ea8ff 42%,#2de3d0 100%);
+      -webkit-background-clip:text; background-clip:text; color:transparent; -webkit-text-fill-color:transparent;
+    }
+    .acj-cap p { margin:16px auto 0; max-width:46ch; font-size:1rem; line-height:1.7; color:var(--muted); }
+    .acj-stage { position:absolute; inset:0; display:flex; align-items:center; justify-content:center; perspective:1400px; }
+    .acj-stage > * { pointer-events:none; }
+    @media(max-width:640px){ .acj-stage { transform:scale(.55); } }
+
+    /* document + risk layers */
+    .acj-doc { position:absolute; margin-top:40px; width:330px; transform-style:preserve-3d; will-change:transform, opacity; }
+    .acj-sheet { border-radius:var(--radius-md); padding:20px 22px; background:linear-gradient(165deg, rgba(255,255,255,.065), rgba(255,255,255,.02)); border:1px solid var(--line); box-shadow:inset 0 1px 0 rgba(255,255,255,.18), 0 40px 80px rgba(0,0,0,.5); backdrop-filter:blur(18px) saturate(180%); }
+    .acj-layer { position:absolute; inset:0 0 auto 0; height:100%; will-change:transform, opacity; opacity:0; }
+    .acj-layer .acj-tag { position:absolute; right:16px; top:14px; font-family:var(--mono); font-size:.6rem; letter-spacing:.18em; text-transform:uppercase; color:var(--blue); }
+    .acj-bar { height:8px; border-radius:5px; background:rgba(255,255,255,.1); margin-top:10px; }
+    .acj-w1 { width:88%; } .acj-w2 { width:62%; } .acj-w3 { width:76%; } .acj-w4 { width:50%; }
+    .acj-doc-main { position:relative; }
+    .acj-doc-top { display:flex; align-items:center; justify-content:space-between; gap:12px; margin-bottom:12px; }
+    .acj-doc-seal { font-family:var(--mono); font-size:.58rem; letter-spacing:.16em; text-transform:uppercase; color:var(--muted); border:1px dashed var(--line2); border-radius:var(--radius-pill); padding:4px 10px; }
+    .acj-doc-file { font-family:var(--mono); font-size:.95rem; color:#fff; }
+    .acj-doc-sign { display:flex; align-items:center; justify-content:space-between; margin-top:16px; border-top:1px solid var(--line); padding-top:12px; }
+    .acj-doc-sig { font-family:var(--display); font-style:italic; font-size:.9rem; color:var(--muted); }
+    .acj-doc-date { font-family:var(--mono); font-size:.6rem; letter-spacing:.12em; color:var(--muted2); }
+
+    /* findings */
+    .acj-finding { position:absolute; display:flex; width:250px; align-items:center; justify-content:space-between; gap:16px; border-radius:14px; border:1px solid var(--line); background:rgba(12,12,14,.85); backdrop-filter:blur(10px); padding:16px 20px; opacity:0; will-change:transform, opacity; }
+    .acj-f-name { font-size:.92rem; font-weight:500; }
+    .acj-f-line { font-family:var(--mono); font-size:.68rem; color:var(--muted2); }
+
+    /* chain */
+    .acj-chain { position:absolute; margin-top:210px; width:min(720px,92vw); opacity:0; will-change:opacity; }
+
+    /* proof artifact (shared by journey + compare + product) */
+    .acj-artifact { position:relative; display:grid; place-items:center; color:var(--blue); background:linear-gradient(165deg, rgba(255,255,255,.13), rgba(255,255,255,.035)); border:1px solid var(--line2); backdrop-filter:blur(12px); transition:color 600ms var(--ease), border-color 600ms var(--ease), box-shadow 600ms var(--ease); }
+    .acj-artifact.green { color:var(--green); border-color:rgba(51,226,122,.42); }
+    .acj-glow { position:absolute; border-radius:50%; z-index:-1; background:radial-gradient(circle, rgba(47,124,255,.22), transparent 70%); filter:blur(14px); transition:background 600ms var(--ease); }
+    .acj-artifact.green .acj-glow { background:radial-gradient(circle, rgba(51,226,122,.2), transparent 70%); }
+    .acj-sheen { position:absolute; inset:0; border-radius:inherit; overflow:hidden; pointer-events:none; }
+    .acj-sheen::before { content:""; position:absolute; inset:-45%; background:conic-gradient(from 0deg, transparent 0deg, rgba(255,255,255,.13) 26deg, transparent 68deg, transparent 360deg); animation:acjSheen 9s linear infinite; }
+    .acj-facet { position:absolute; inset:0; border-radius:inherit; pointer-events:none; background:linear-gradient(118deg, transparent 42%, rgba(255,255,255,.05) 43%, transparent 56%), linear-gradient(244deg, transparent 58%, rgba(255,255,255,.04) 59%, transparent 72%); }
+    .acj-shield { position:relative; z-index:2; }
+    @keyframes acjSheen { to { transform:rotate(360deg); } }
+
+    .acj-art { position:absolute; z-index:10; opacity:0; will-change:transform, opacity; }
+    .acj-ring { position:absolute; left:50%; top:50%; width:188px; height:188px; transform:translate(-50%,-50%); opacity:0; }
+
+    /* verify readout */
+    .acj-verify { position:absolute; margin-top:-190px; display:flex; flex-direction:column; align-items:center; gap:12px; opacity:0; will-change:transform, opacity; }
+    .acj-v-field { display:flex; align-items:center; gap:12px; max-width:88vw; border-radius:var(--radius-pill); border:1px solid rgba(255,255,255,.09); background:rgba(255,255,255,.04); padding:10px 10px 10px 20px; font-family:var(--mono); font-size:.72rem; color:var(--muted); }
+    .acj-v-hash { max-width:340px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+    .acj-v-go { border-radius:var(--radius-pill); background:#fff; color:#060606; padding:6px 14px; font-family:var(--display); font-size:.66rem; font-weight:600; }
+    .acj-v-confirm { opacity:0; color:var(--green) !important; font-family:var(--mono); font-size:.7rem; letter-spacing:.18em; text-transform:uppercase; }
+
+    /* console reveal */
+    .acj-dash { position:absolute; bottom:6vh; width:min(560px,90vw); opacity:0; will-change:transform, opacity, filter; display:none; }
+    @media(min-width:768px){ .acj-dash { display:block; } }
+    .acj-console { overflow:hidden; border-radius:var(--radius-md); border:1px solid var(--line); background:rgba(11,11,13,.9); box-shadow:0 40px 90px rgba(0,0,0,.6); backdrop-filter:blur(18px) saturate(180%); }
+    .acj-console-head { display:flex; align-items:center; gap:6px; border-bottom:1px solid var(--line); padding:12px 16px; }
+    .acj-console-dot { width:8px; height:8px; border-radius:50%; background:rgba(255,255,255,.15); }
+    .acj-console-grid { display:grid; grid-template-columns:1fr auto; align-items:center; column-gap:24px; row-gap:10px; padding:16px 20px; font-size:.78rem; }
+    .acj-mono { font-family:var(--mono); }
+    .acj-green { color:var(--green) !important; }
+
+    /* compare — "Same audit. Different weight." (native AuditChain surfaces) */
+    .acj-compare { max-width:1080px; margin:0 auto; display:grid; gap:16px; }
+    @media(min-width:820px){ .acj-compare { grid-template-columns:1fr 1fr; } }
+    .acj-cmp { position:relative; overflow:hidden; border-radius:var(--radius-xl); border:1px solid var(--line); background:rgba(255,255,255,.05); box-shadow:var(--shadow-md); backdrop-filter:blur(20px) saturate(180%); padding:40px; }
+    .acj-cmp-ac { background:radial-gradient(90% 100% at 50% 0%, rgba(47,124,255,.08), transparent 60%), rgba(255,255,255,.05); }
+    .acj-cmp-pdf { margin:30px auto 0; width:210px; border-radius:14px; border:1px dashed rgba(255,255,255,.16); background:rgba(255,255,255,.02); padding:20px; opacity:.7; }
+    .acj-cmp-pdf .acj-bar { height:6px; margin-top:8px; }
+    .acj-cmp-sig { margin-top:16px; font-family:var(--display); font-style:italic; font-size:.78rem; color:var(--muted2); }
+    .acj-cmp-art { display:grid; justify-items:center; margin-top:30px; }
+    .acj-cmp ul { list-style:none; max-width:260px; margin:30px auto 0; padding:0; display:grid; gap:10px; font-size:.95rem; color:var(--muted); }
+    .acj-cmp-ac ul { color:var(--text); }
+    .acj-cmp li { display:flex; align-items:center; gap:12px; }
+    .acj-cmp li::before { content:""; height:1px; width:16px; background:rgba(255,255,255,.2); }
+    .acj-cmp-ac li::before { background:var(--green); }
+
+    /* product — "A record, not a dashboard." (native AuditChain surfaces) */
+    .acj-proof { max-width:1080px; margin:0 auto; display:grid; gap:16px; }
+    @media(min-width:900px){ .acj-proof { grid-template-columns:minmax(0,1.05fr) minmax(0,.95fr); } }
+    .acj-proof-card, .acj-proof-record { border-radius:var(--radius-xl); border:1px solid var(--line); background:rgba(255,255,255,.05); box-shadow:var(--shadow-md); backdrop-filter:blur(20px) saturate(180%); overflow:hidden; padding:26px; position:relative; }
+    .acj-proof-record { display:grid; gap:16px; align-content:start; }
+    .acj-proof-card::before { content:""; position:absolute; inset:0; background:radial-gradient(800px 340px at 50% 0%, rgba(47,124,255,.10), transparent 62%); pointer-events:none; }
+    .acj-proof-top, .acj-record-head { display:flex; align-items:center; justify-content:space-between; gap:12px; position:relative; z-index:1; }
+    .acj-proof-main { position:relative; margin-top:18px; min-height:380px; }
+    .acj-stat-stack { position:absolute; right:0; top:30px; width:220px; display:grid; gap:12px; }
+    .acj-stat { padding:14px; border-radius:20px; background:rgba(255,255,255,.05); border:1px solid var(--line); box-shadow:inset 0 1px 0 rgba(255,255,255,.08); }
+    .acj-stat strong { display:block; margin-top:8px; font-size:.9rem; line-height:1.55; color:var(--text); word-break:break-word; font-family:var(--mono); }
+    .acj-flow { display:flex; flex-wrap:wrap; align-items:center; gap:10px; margin-top:18px; position:relative; z-index:1; }
+    .acj-flow span { padding:7px 12px; border-radius:var(--radius-pill); background:rgba(255,255,255,.04); border:1px solid var(--line); color:var(--muted); font-family:var(--mono); font-size:.72rem; }
+    .acj-flow .acj-arrow { border:none; padding:0; background:transparent; color:var(--muted2); }
+    .acj-board { background:rgba(0,0,0,.28); border:1px solid var(--line); border-radius:var(--radius-lg); padding:4px 18px; }
+    .acj-board .acj-row { display:grid; grid-template-columns:140px 1fr auto; gap:14px; align-items:center; padding:14px 0; border-bottom:1px solid var(--line); }
+    .acj-board .acj-row:last-child { border-bottom:none; }
+    .acj-board .acj-row > span:first-child { color:var(--muted2); font-size:.85rem; }
+    .acj-board code { font-family:var(--mono); font-size:.82rem; color:var(--text); word-break:break-all; }
+    .acj-board .acj-state { font-size:.78rem; color:var(--muted); }
+    .acj-note p { color:var(--muted); font-size:.95rem; line-height:1.75; max-width:34ch; margin:10px 0 0; }
+    .acj-proof-shell { will-change:transform, opacity, filter; }
+    @media(max-width:900px){
+      .acj-stat-stack { position:relative; right:auto; top:auto; width:100%; margin-top:22px; }
+      .acj-proof-main { min-height:auto; }
+      .acj-board .acj-row { grid-template-columns:1fr; gap:6px; }
+    }
+
+    @media(prefers-reduced-motion:reduce){
+      .acj-cap, .acj-art, .acj-verify, .acj-dash, .acj-finding, .acj-layer, .acj-chain { transition:none !important; }
+      .acj-sheen::before { animation:none !important; }
+    }
+  </style>
 </head>
 <body>
   <div class="noise"></div>
@@ -1092,6 +1214,190 @@
             <article class="surface-card reveal"><div class="badge blue">Upload</div><h3>Insert a contract.</h3><p>Drag a Solidity file into a glass panel that reacts like an Apple file interaction, not a static form.</p><div class="illustration-upload"><div class="illus-file"></div><div class="illus-arrow"></div><div class="illus-screen"><div class="linebar w1"></div><div class="linebar w2"></div><div class="linebar w3"></div><div class="linebar w4"></div><div class="linebar w5"></div></div></div></article>
             <article class="surface-card reveal" style="--delay:100ms;"><div class="badge orange">Fetch Report</div><h3>Find a report.</h3><p>Enter the transaction hash and recover the stored audit from the chain in a clean, readable way.</p><div class="illustration-fetch"><div class="illus-hash"></div><div class="illus-network"></div></div></article>
             <article class="surface-card reveal" style="--delay:200ms;"><div class="badge green">Verify</div><h3>Verify authenticity.</h3><p>One transaction hash. The backend decodes the AuditStored event and compares hashes on-chain. Verified or not — no ambiguity.</p><div class="illustration-verify"><div class="illus-check-ring"></div><div class="illus-confirm-card"></div><div class="illus-steps"><div class="illus-step"></div><div class="illus-step"></div><div class="illus-step"></div></div></div></article>
+          </div>
+        </div>
+      </section>
+
+      <!-- ════ STORYTELLING JOURNEY (imported from prototype, restyled to AuditChain) ════ -->
+      <section class="acj-journey" id="acjJourney" aria-label="How trust becomes verifiable">
+        <div class="acj-pin">
+
+          <div class="acj-head">
+            <div class="acj-cap" data-acjcap="0">
+              <span class="acj-kicker">01 · The document</span>
+              <h2>Trust shouldn't depend on a PDF.</h2>
+              <p>Most audits end as static documents. Anyone can read them. Almost nobody can verify them.</p>
+            </div>
+            <div class="acj-cap" data-acjcap="1">
+              <span class="acj-kicker">02 · The analysis</span>
+              <h2>Every line examined.</h2>
+            </div>
+            <div class="acj-cap" data-acjcap="2">
+              <span class="acj-kicker">03 · The findings</span>
+              <h2>Findings become visible.</h2>
+              <p>Risk should not hide inside thousands of lines of code.</p>
+            </div>
+            <div class="acj-cap" data-acjcap="3">
+              <span class="acj-kicker">04 · The proof</span>
+              <h2>Trust becomes evidence.</h2>
+            </div>
+            <div class="acj-cap" data-acjcap="4">
+              <span class="acj-kicker">05 · The record</span>
+              <h2>Recorded. Not claimed.</h2>
+              <p>Every audit receives a permanent proof record.</p>
+            </div>
+          </div>
+
+          <div class="acj-stage">
+
+            <div class="acj-doc" id="acjDoc">
+              <div class="acj-sheet acj-layer" data-acjl="3"><span class="acj-tag">Risk</span><div class="acj-bar acj-w2"></div><div class="acj-bar acj-w3"></div><div class="acj-bar acj-w4"></div></div>
+              <div class="acj-sheet acj-layer" data-acjl="2"><span class="acj-tag">Security</span><div class="acj-bar acj-w3"></div><div class="acj-bar acj-w1"></div><div class="acj-bar acj-w2"></div></div>
+              <div class="acj-sheet acj-layer" data-acjl="1"><span class="acj-tag">Code</span><div class="acj-bar acj-w2"></div><div class="acj-bar acj-w2"></div><div class="acj-bar acj-w1"></div></div>
+              <div class="acj-sheet acj-doc-main">
+                <div class="acj-doc-top"><span class="acj-kicker" style="margin:0;">Security audit · Final</span><span class="acj-doc-seal">Approved</span></div>
+                <div class="acj-doc-file">TokenSale_Audit.pdf</div>
+                <div class="acj-bar acj-w1"></div><div class="acj-bar acj-w2"></div><div class="acj-bar acj-w3"></div><div class="acj-bar acj-w4"></div>
+                <div class="acj-doc-sign"><span class="acj-doc-sig">Signed, Lead Auditor</span><span class="acj-doc-date">12 MAR 2026</span></div>
+              </div>
+            </div>
+
+            <div class="acj-finding" data-acjf="0"><div><div class="acj-f-name">Reentrancy</div><div class="acj-kicker" style="margin:4px 0 0;">High</div></div><span class="acj-f-line">L13</span></div>
+            <div class="acj-finding" data-acjf="1"><div><div class="acj-f-name">Access Control</div><div class="acj-kicker" style="margin:4px 0 0;">Medium</div></div><span class="acj-f-line">L21</span></div>
+            <div class="acj-finding" data-acjf="2"><div><div class="acj-f-name">Unchecked Call</div><div class="acj-kicker" style="margin:4px 0 0;">Low</div></div><span class="acj-f-line">L34</span></div>
+
+            <svg class="acj-chain" id="acjChain" viewBox="0 0 720 120" fill="none" aria-hidden="true">
+              <path id="acjChainPath" d="M10 60 H 290 M 430 60 H 710" stroke="rgba(255,255,255,.18)" stroke-width="1" pathLength="1"/>
+              <g fill="rgba(255,255,255,.3)">
+                <circle cx="10" cy="60" r="3"/><circle cx="150" cy="60" r="3"/><circle cx="290" cy="60" r="3"/>
+                <circle cx="430" cy="60" r="3"/><circle cx="570" cy="60" r="3"/><circle cx="710" cy="60" r="3"/>
+              </g>
+              <circle id="acjSocketRing" cx="360" cy="60" r="30" fill="none" stroke="rgba(53,185,255,.5)" stroke-width="1" opacity="0"/>
+              <circle id="acjSocketDot" cx="360" cy="60" r="3.5" fill="#35b9ff" opacity="0"/>
+            </svg>
+
+            <div class="acj-art" id="acjArt">
+              <div class="acj-artifact" id="acjArtBox" style="width:124px;height:144px;border-radius:27px;box-shadow:inset 0 1px 0 rgba(255,255,255,.32),inset 0 0 31px rgba(47,124,255,.1),0 45px 87px rgba(0,0,0,.6);">
+                <span class="acj-glow" style="inset:-30px;" aria-hidden="true"></span>
+                <span class="acj-sheen" aria-hidden="true"></span>
+                <span class="acj-facet" aria-hidden="true"></span>
+                <svg class="acj-shield" viewBox="0 0 32 32" fill="none" style="width:50px;" aria-hidden="true"><path d="M16 4l9 3.4v8.1c0 5.6-4 10-9 11.7-5-1.7-9-6.1-9-11.7V7.4z" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/><path d="M11.8 16.2l3 3 5.4-5.8" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              </div>
+              <svg class="acj-ring" id="acjRing" viewBox="0 0 100 100" aria-hidden="true">
+                <circle id="acjRingCircle" cx="50" cy="50" r="47" fill="none" stroke="#33e27a" stroke-width="0.8" stroke-linecap="round" pathLength="1" stroke-dasharray="1" stroke-dashoffset="1" transform="rotate(-90 50 50)"/>
+              </svg>
+            </div>
+
+            <div class="acj-verify" id="acjVerify">
+              <div class="acj-v-field"><span class="acj-v-hash">0x4a9f3c2d8b1e7f6a9c0d2e4f6a8b1c3d5e7f9a0b2c4d6e8f1a3b5c7d9e0f2a1b</span><span class="acj-v-go">Verify</span></div>
+              <div class="acj-v-confirm" id="acjConfirm">Authentic · Unmodified · Publicly provable</div>
+            </div>
+
+            <div class="acj-dash" id="acjDash">
+              <div class="acj-console">
+                <div class="acj-console-head"><span class="acj-console-dot"></span><span class="acj-console-dot"></span><span class="acj-console-dot"></span><span class="acj-kicker" style="margin:0 0 0 12px;">AuditChain · Console</span></div>
+                <div class="acj-console-grid">
+                  <span class="acj-mono" style="color:var(--muted);">TokenSale.sol</span><span class="acj-kicker" style="margin:0;">3 findings</span>
+                  <span class="acj-mono" style="color:var(--muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">0x4a9f3c2d8b1e7f6a9c0d2e4f6a8b…</span><span class="acj-kicker acj-green" style="margin:0;">Verified</span>
+                </div>
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </section>
+
+      <!-- ════ COMPARE — "Same audit. Different weight." ════ -->
+      <section class="section">
+        <div class="wrap">
+          <div class="section-head reveal">
+            <div class="section-label">Why it matters</div>
+            <h2>Same audit. Different weight.</h2>
+          </div>
+          <div class="acj-compare">
+            <div class="acj-cmp reveal">
+              <div class="section-label" style="margin-bottom:6px;">Traditional audit</div>
+              <div class="acj-cmp-pdf">
+                <div class="acj-mono" style="font-size:.8rem;color:var(--muted);margin-bottom:10px;">Audit_Final.pdf</div>
+                <div class="acj-bar" style="width:82%;"></div><div class="acj-bar" style="width:60%;"></div><div class="acj-bar" style="width:72%;"></div><div class="acj-bar" style="width:48%;"></div>
+                <div class="acj-cmp-sig">Signed</div>
+              </div>
+              <ul><li>A file</li><li>Can be modified</li><li>Verified by nobody</li></ul>
+            </div>
+            <div class="acj-cmp acj-cmp-ac reveal" style="--delay:100ms;">
+              <div class="section-label" style="margin-bottom:6px;color:var(--blue);">AuditChain</div>
+              <div class="acj-cmp-art">
+                <div class="acj-artifact green" style="width:104px;height:120px;border-radius:23px;box-shadow:inset 0 1px 0 rgba(255,255,255,.32),inset 0 0 26px rgba(51,226,122,.14),0 37px 73px rgba(0,0,0,.6);">
+                  <span class="acj-glow" style="inset:-25px;" aria-hidden="true"></span>
+                  <span class="acj-sheen" aria-hidden="true"></span>
+                  <span class="acj-facet" aria-hidden="true"></span>
+                  <svg class="acj-shield" viewBox="0 0 32 32" fill="none" style="width:42px;" aria-hidden="true"><path d="M16 4l9 3.4v8.1c0 5.6-4 10-9 11.7-5-1.7-9-6.1-9-11.7V7.4z" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/><path d="M11.8 16.2l3 3 5.4-5.8" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                </div>
+              </div>
+              <ul><li>A record</li><li>Immutable, anchored</li><li>Verified by anyone</li></ul>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ════ PRODUCT — "A record, not a dashboard." ════ -->
+      <section class="section">
+        <div class="wrap">
+          <div class="section-head reveal">
+            <div class="section-label">The instrument</div>
+            <h2>A record, not a dashboard.</h2>
+            <p class="lead">AuditChain collapses the work into one proof object: the report hash, IPFS CID, contract address, and verification state that can be checked later.</p>
+          </div>
+
+          <div class="acj-proof acj-proof-shell reveal" id="acjProofShell">
+            <div class="acj-proof-card">
+              <div class="acj-proof-top">
+                <div class="section-label">Proof object</div>
+                <span class="badge green">Anchored</span>
+              </div>
+
+              <div class="acj-proof-main">
+                <div class="acj-artifact green" style="width:210px;height:250px;border-radius:34px;box-shadow:inset 0 1px 0 rgba(255,255,255,.28),inset 0 0 40px rgba(51,226,122,.14),0 50px 110px rgba(0,0,0,.62);">
+                  <span class="acj-glow" style="inset:-30px;" aria-hidden="true"></span>
+                  <span class="acj-sheen" aria-hidden="true"></span>
+                  <span class="acj-facet" aria-hidden="true"></span>
+                  <svg class="acj-shield" viewBox="0 0 32 32" fill="none" style="width:62px;" aria-hidden="true">
+                    <path d="M16 4l9 3.4v8.1c0 5.6-4 10-9 11.7-5-1.7-9-6.1-9-11.7V7.4z" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/>
+                    <path d="M11.8 16.2l3 3 5.4-5.8" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                  </svg>
+                </div>
+
+                <div class="acj-stat-stack">
+                  <div class="acj-stat"><div class="section-label" style="font-size:.74rem;padding:6px 11px;">Report hash</div><strong>0x9e1f4c8a2b6d7e3f1a0b2c3d4e5f6789…</strong></div>
+                  <div class="acj-stat"><div class="section-label" style="font-size:.74rem;padding:6px 11px;">IPFS CID</div><strong>bafybeigdyrzt5sfp7udm7hu76uh7y26nf…</strong></div>
+                  <div class="acj-stat"><div class="section-label" style="font-size:.74rem;padding:6px 11px;">Verification</div><strong style="font-family:var(--text-font);">Anyone can re-check later</strong></div>
+                </div>
+              </div>
+
+              <div class="acj-flow">
+                <span>Report</span><span class="acj-arrow">→</span><span>Hash</span><span class="acj-arrow">→</span><span>IPFS</span><span class="acj-arrow">→</span><span>Ethereum</span><span class="acj-arrow">→</span><span>Verify</span>
+              </div>
+            </div>
+
+            <div class="acj-proof-record">
+              <div class="acj-record-head">
+                <div class="section-label">Public record</div>
+                <span class="badge blue">Sepolia</span>
+              </div>
+
+              <div class="acj-board">
+                <div class="acj-row"><span>Contract</span><code>TokenSale.sol</code><span class="acj-state">Audited</span></div>
+                <div class="acj-row"><span>Findings</span><code>3 issues</code><span class="acj-state">Ranked</span></div>
+                <div class="acj-row"><span>Report hash</span><code>0x9e1f4c8a2b6d7e3f1a0b2c3d4e5f6789…</code><span class="acj-state">Locked</span></div>
+                <div class="acj-row"><span>IPFS CID</span><code>bafybeigdyrzt5sfp7udm7hu76uh7y26nf…</code><span class="acj-state">Pinned</span></div>
+                <div class="acj-row"><span>Status</span><code>Verified on Ethereum Sepolia</code><span class="acj-state">Public</span></div>
+              </div>
+
+              <div class="acj-note">
+                <div class="section-label">In one sentence</div>
+                <p>AuditChain turns a report into a verifiable object instead of a PDF someone has to trust.</p>
+              </div>
+            </div>
           </div>
         </div>
       </section>
@@ -2099,6 +2405,140 @@
       if (vi) vi.addEventListener('keydown', (e) => { if (e.key === 'Enter') runVerify(); });
       setPipeline('idle');
     })();
+  </script>
+
+  <!-- ════ Storytelling journey scroll engine (imported from prototype, namespaced acj-, self-contained) ════ -->
+  <script>
+  (function () {
+    'use strict';
+    var reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    var $ = function (id) { return document.getElementById(id); };
+    var clamp = function (v, a, b) { return Math.min(b, Math.max(a, v)); };
+
+    function pw(p, stops, vals) {
+      if (p <= stops[0]) return vals[0];
+      for (var i = 1; i < stops.length; i++) {
+        if (p <= stops[i]) {
+          var t = (p - stops[i - 1]) / (stops[i] - stops[i - 1]);
+          return vals[i - 1] + (vals[i] - vals[i - 1]) * t;
+        }
+      }
+      return vals[vals.length - 1];
+    }
+
+    var journey = $('acjJourney');
+    if (!journey) return;
+    var doc = $('acjDoc');
+    var layers = Array.prototype.slice.call(document.querySelectorAll('.acj-layer'));
+    var caps = Array.prototype.slice.call(document.querySelectorAll('.acj-cap'));
+    var findings = Array.prototype.slice.call(document.querySelectorAll('.acj-finding'));
+    var chain = $('acjChain'), chainPath = $('acjChainPath'), socketRing = $('acjSocketRing'), socketDot = $('acjSocketDot');
+    var art = $('acjArt'), artBox = $('acjArtBox'), ring = $('acjRing'), ringCircle = $('acjRingCircle');
+    var verify = $('acjVerify'), confirmEl = $('acjConfirm');
+    var dash = $('acjDash');
+    var productShell = $('acjProofShell');
+
+    chainPath.style.strokeDasharray = '1';
+    chainPath.style.strokeDashoffset = '1';
+
+    /* 5 beats — last beat ("Recorded. Not claimed.") holds through the proof/verify climax */
+    var CAP_RANGES = [[0, .14], [.16, .29], [.31, .48], [.52, .70], [.74, 1]];
+    var LAYER_Y = [34, 66, 96], LAYER_Z = [60, 120, 180];
+
+    function apply(p) {
+      caps.forEach(function (c, i) {
+        if (!CAP_RANGES[i]) return;
+        var a = CAP_RANGES[i][0], b = CAP_RANGES[i][1];
+        var f = Math.min(.035, (b - a) / 3);
+        c.style.opacity = pw(p, [a, a + f, b - f, b], [0, 1, 1, 0]);
+        c.style.transform = 'translateY(' + pw(p, [a, a + f], [14, 0]) + 'px)';
+      });
+
+      var docO = pw(p, [0, .45, .56], [1, 1, 0]);
+      doc.style.opacity = docO;
+      doc.style.transform =
+        'translateX(' + pw(p, [.28, .36, .5, .58], [0, -150, -150, 0]) + 'px)' +
+        ' translateY(' + pw(p, [0, .15], [10, 0]) + 'px)' +
+        ' rotateY(' + pw(p, [0, .15, .3], [-10, 7, 0]) + 'deg)' +
+        ' scale(' + pw(p, [0, .12, .5, .58], [.96, 1, 1, .15]) + ')';
+
+      var sep = pw(p, [.15, .28, .4, .5], [0, 1, 1, 0]);
+      var layerO = pw(p, [.15, .2, .42, .5], [0, 1, 1, 0]);
+      layers.forEach(function (l) {
+        var n = parseInt(l.dataset.acjl, 10);
+        l.style.opacity = layerO;
+        l.style.transform = 'translateY(' + (-LAYER_Y[n - 1] * sep) + 'px) translateZ(' + (-LAYER_Z[n - 1] * sep) + 'px)';
+      });
+
+      var converge = pw(p, [.5, .6], [0, 1]);
+      findings.forEach(function (fEl, i) {
+        var a = .32 + i * .04;
+        var e = pw(p, [a, a + .07], [0, 1]);
+        var x = 60 + e * (130 + i * 18) - converge * (190 + i * 18);
+        var y = pw(converge, [0, 1], [(i - 1) * 84 + 40, 40]);
+        fEl.style.opacity = e * (1 - converge);
+        fEl.style.transform = 'translate(' + x + 'px,' + y + 'px) scale(' + (1 - .7 * converge) + ')';
+      });
+
+      chain.style.opacity = pw(p, [.7, .78, .95, 1], [0, 1, 1, .55]);
+      chainPath.style.strokeDashoffset = 1 - pw(p, [.7, .82], [0, 1]);
+      var sg = pw(p, [.79, .82], [0, 1]);
+      socketRing.setAttribute('opacity', sg);
+      socketDot.setAttribute('opacity', sg);
+
+      var artO = pw(p, [.52, .62], [0, 1]);
+      art.style.opacity = artO;
+      art.style.transform =
+        'translateY(' + pw(p, [.66, .74, .8, .82, .9, 1], [0, 96, 142, 136, 136, 118]) + 'px)' +
+        ' scale(' + (pw(p, [.52, .66], [.4, 1]) * pw(p, [.795, .815, .83], [1, 1.04, 1])) + ')';
+      artBox.classList.toggle('green', p > .9);
+
+      ring.style.opacity = pw(p, [.88, .91], [0, 1]);
+      ringCircle.style.strokeDashoffset = 1 - pw(p, [.89, .96], [0, 1]);
+
+      verify.style.opacity = pw(p, [.85, .89], [0, 1]);
+      verify.style.transform = 'translateY(' + pw(p, [.85, .9], [26, 0]) + 'px)';
+      confirmEl.style.opacity = pw(p, [.93, .97], [0, 1]);
+
+      dash.style.opacity = pw(p, [.94, 1], [0, 1]);
+      dash.style.transform = 'scale(' + pw(p, [.94, 1], [.94, 1]) + ')';
+      dash.style.filter = 'blur(' + pw(p, [.94, 1], [10, 0]) + 'px)';
+    }
+
+    var cur = 0, running = false;
+    function frame() {
+      var r = journey.getBoundingClientRect();
+      var onScreen = r.bottom > -200 && r.top < window.innerHeight + 200;
+      if (onScreen) {
+        var total = Math.max(r.height - window.innerHeight, 1);
+        var target = clamp(-r.top / total, 0, 1);
+        if (Math.abs(target - cur) > .35) cur = target;
+        cur += (target - cur) * .14;
+        if (Math.abs(target - cur) < .0004) cur = target;
+        apply(cur);
+      }
+
+      if (productShell) {
+        var pr = productShell.getBoundingClientRect();
+        if (pr.bottom > -200 && pr.top < window.innerHeight + 200) {
+          var k = clamp((window.innerHeight - pr.top) / (window.innerHeight / 2 + pr.height / 2), 0, 1);
+          productShell.style.transform = 'perspective(1200px) rotateX(' + (10 * (1 - k)).toFixed(2) + 'deg) scale(' + (.96 + .04 * k).toFixed(3) + ')';
+          productShell.style.filter = 'blur(' + (6 * (1 - clamp(k / .8, 0, 1))).toFixed(2) + 'px)';
+        }
+      }
+      requestAnimationFrame(frame);
+    }
+
+    if (reduced) {
+      apply(1);
+      caps.forEach(function (c) { c.style.opacity = 0; });
+      var last = document.querySelector('.acj-cap[data-acjcap="4"]');
+      if (last) last.style.opacity = 1;
+    } else {
+      apply(0);
+      requestAnimationFrame(frame);
+    }
+  })();
   </script>
 </body>
 </html>
