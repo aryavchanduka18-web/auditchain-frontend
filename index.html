@@ -1310,8 +1310,6 @@
                 <circle cx="10" cy="60" r="3"/><circle cx="150" cy="60" r="3"/><circle cx="290" cy="60" r="3"/>
                 <circle cx="430" cy="60" r="3"/><circle cx="570" cy="60" r="3"/><circle cx="710" cy="60" r="3"/>
               </g>
-              <circle id="acjSocketRing" cx="360" cy="60" r="30" fill="none" stroke="rgba(53,185,255,.5)" stroke-width="1" opacity="0"/>
-              <circle id="acjSocketDot" cx="360" cy="60" r="3.5" fill="#35b9ff" opacity="0"/>
             </svg>
 
             <div class="acj-art" id="acjArt">
@@ -2419,7 +2417,7 @@
     var layers = Array.prototype.slice.call(document.querySelectorAll('.acj-layer'));
     var caps = Array.prototype.slice.call(document.querySelectorAll('.acj-cap'));
     var findings = Array.prototype.slice.call(document.querySelectorAll('.acj-finding'));
-    var chain = $('acjChain'), chainPath = $('acjChainPath'), socketRing = $('acjSocketRing'), socketDot = $('acjSocketDot');
+    var chain = $('acjChain'), chainPath = $('acjChainPath');
     var art = $('acjArt'), artBox = $('acjArtBox'), ring = $('acjRing'), ringCircle = $('acjRingCircle');
     var verify = $('acjVerify'), confirmEl = $('acjConfirm');
     var dash = $('acjDash');
@@ -2469,9 +2467,6 @@
 
       chain.style.opacity = pw(p, [.7, .78, .95, 1], [0, 1, 1, .55]);
       chainPath.style.strokeDashoffset = 1 - pw(p, [.7, .82], [0, 1]);
-      var sg = pw(p, [.79, .82], [0, 1]);
-      socketRing.setAttribute('opacity', sg);
-      socketDot.setAttribute('opacity', sg);
 
       var artO = pw(p, [.52, .62], [0, 1]);
       art.style.opacity = artO;
