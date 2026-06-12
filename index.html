@@ -687,6 +687,19 @@
     }
     .layer.dim-layer { opacity:.16 !important; filter:brightness(.78); }
 
+    /* Scroll-driven story stack (Interactive Trust section) */
+    .story-track { position:relative; }
+    .story-pin { position:sticky; top:88px; display:flex; align-items:center; justify-content:center; }
+    .story-stack { position:relative; width:100%; max-width:760px; margin:0 auto; }
+    .story-card {
+      position:absolute; inset:0; overflow:hidden;
+      opacity:0; transform:translateY(70px) scale(.92); filter:blur(6px);
+      will-change:transform, opacity, filter;
+    }
+    .story-card[data-story="0"] { opacity:1; transform:none; filter:none; }
+    .story-card.is-active { box-shadow: 0 0 24px rgba(47,124,255,.22), var(--shadow-md); transition:box-shadow 420ms var(--ease); }
+    @media (max-width:1100px) { .story-stack { max-width:620px; } }
+
     .surface-card {
       padding:22px; min-height:258px; border-radius:30px; background:rgba(255,255,255,.05); border:1px solid rgba(255,255,255,.08);
       box-shadow:var(--shadow-md); transition:transform 240ms var(--ease), border-color 240ms var(--ease), background 240ms var(--ease);
@@ -909,6 +922,10 @@
     @media (prefers-reduced-motion: reduce) {
       *, *::before, *::after { animation-duration:.001ms !important; animation-iteration-count:1 !important; transition-duration:.001ms !important; scroll-behavior:auto !important; }
       .reveal, .reveal-left, .reveal-right { opacity:1 !important; transform:none !important; }
+      .story-track { height:auto !important; }
+      .story-pin { position:static; }
+      .story-stack { position:static; height:auto !important; display:grid; gap:18px; max-width:none; }
+      .story-card { position:relative !important; opacity:1 !important; transform:none !important; filter:none !important; inset:auto; box-shadow:var(--shadow-md) !important; }
     }
   </style>
 
@@ -1173,31 +1190,52 @@
           <div class="section-head reveal">
             <div class="section-label">Interactive Trust</div>
             <h2>Choose what the system reveals.</h2>
-            <p class="lead">Tap a stage and the visual panel changes to match the step. Only the active card should come forward, the others should dim.</p>
+            <p class="lead">Scroll through the stages. Each one rises into focus while the rest settle behind it, blurred and dimmed — the system, revealed in motion.</p>
           </div>
-          <div class="story-grid">
-            <div class="switcher reveal-left">
-              <div class="switcher-tabs" id="switchTabs">
-                <button class="switch-tab active" data-switch="problem">Problem</button>
-                <button class="switch-tab" data-switch="analysis">Analysis</button>
-                <button class="switch-tab" data-switch="storage">Storage</button>
-                <button class="switch-tab" data-switch="verification">Verification</button>
-              </div>
-              <div class="switch-panel" id="switchPanel">
-                <div class="switch-title"><h3 id="switchTitle">Problem</h3><div class="badge red" id="switchBadge">Broken trust</div></div>
-                <div class="switch-copy" id="switchCopy">Traditional audit workflows end in static documents. AuditChain turns that broken flow into a living trust system.</div>
-                <div class="flow-grid" id="switchGrid">
-                  <div class="flow-card active"><strong>PDF reports</strong><span>Editable, email-based, and hard to verify.</span></div>
-                  <div class="flow-card"><strong>Slow delivery</strong><span>Manual review creates long wait times.</span></div>
-                  <div class="flow-card"><strong>Hidden proof</strong><span>Most reports live inside private servers.</span></div>
-                  <div class="flow-card"><strong>Lost confidence</strong><span>Users cannot independently prove authenticity.</span></div>
+          <div class="story-track" id="storyTrack">
+            <div class="story-pin">
+              <div class="story-stack" id="storyStack">
+                <div class="story-card switch-panel" data-story="0">
+                  <div class="switch-title"><h3>Problem</h3><div class="badge red">Broken trust</div></div>
+                  <div class="switch-copy">Traditional audit workflows end in static documents. AuditChain turns that broken flow into a living trust system.</div>
+                  <div class="flow-grid">
+                    <div class="flow-card"><strong>PDF reports</strong><span>Editable, email-based, and hard to verify.</span></div>
+                    <div class="flow-card"><strong>Slow delivery</strong><span>Manual review creates long wait times.</span></div>
+                    <div class="flow-card"><strong>Hidden proof</strong><span>Most reports live inside private servers.</span></div>
+                    <div class="flow-card"><strong>Lost confidence</strong><span>Users cannot independently prove authenticity.</span></div>
+                  </div>
+                </div>
+                <div class="story-card switch-panel" data-story="1">
+                  <div class="switch-title"><h3>Analysis</h3><div class="badge blue">AI review</div></div>
+                  <div class="switch-copy">The contract is inspected line by line. Findings appear as discoveries, not as a wall of text.</div>
+                  <div class="flow-grid">
+                    <div class="flow-card"><strong>Vulnerability detection</strong><span>Reentrancy, access control, call handling, and more.</span></div>
+                    <div class="flow-card"><strong>Severity scoring</strong><span>Findings are ranked from low to critical.</span></div>
+                    <div class="flow-card"><strong>Suggested fixes</strong><span>The system proposes safer code patterns.</span></div>
+                    <div class="flow-card"><strong>Readable output</strong><span>The report is structured for real developers.</span></div>
+                  </div>
+                </div>
+                <div class="story-card switch-panel" data-story="2">
+                  <div class="switch-title"><h3>Storage</h3><div class="badge blue">Pinned</div></div>
+                  <div class="switch-copy">The report is pinned to IPFS and anchored on Ethereum. The record becomes public, permanent, and easy to retrieve later.</div>
+                  <div class="flow-grid">
+                    <div class="flow-card"><strong>IPFS CID</strong><span>Content-addressed storage for the full report.</span></div>
+                    <div class="flow-card"><strong>Ethereum hash</strong><span>On-chain anchoring gives the proof permanence.</span></div>
+                    <div class="flow-card"><strong>Public record</strong><span>Anyone can inspect the trail independently.</span></div>
+                    <div class="flow-card"><strong>No private lock-in</strong><span>The record does not depend on one server.</span></div>
+                  </div>
+                </div>
+                <div class="story-card switch-panel" data-story="3">
+                  <div class="switch-title"><h3>Verification</h3><div class="badge green">Visible trust</div></div>
+                  <div class="switch-copy">Verification is the final pulse. The interface calmly confirms whether the report hash matches the on-chain record.</div>
+                  <div class="flow-grid">
+                    <div class="flow-card"><strong>Tx hash lookup</strong><span>One identifier is enough to recover the proof.</span></div>
+                    <div class="flow-card"><strong>Event decoding</strong><span>The backend reads the AuditStored log.</span></div>
+                    <div class="flow-card"><strong>Hash comparison</strong><span>Stored and decoded hashes are compared.</span></div>
+                    <div class="flow-card"><strong>Green confirmation</strong><span>The interface visibly shifts into a verified state.</span></div>
+                  </div>
                 </div>
               </div>
-            </div>
-            <div class="visual-stack reveal-right" id="visualStack">
-              <div class="layer contract active-layer" data-layer="problem"><div class="inner"><div class="label">Problem</div><h4>Reports fragment into editable documents.</h4><p>Trust is scattered across PDFs, emails, and private storage.</p></div></div>
-              <div class="layer analysis dim-layer" data-layer="analysis"><div class="inner"><div class="label">Analysis</div><h4>AI audit scans vulnerabilities.</h4><p>Security patterns surface through a calm, readable interface.</p></div></div>
-              <div class="layer proof dim-layer" data-layer="storage"><div class="inner"><div class="label">Proof</div><h4>Report secured on IPFS.</h4><p>The record becomes a single, permanent proof object.</p></div></div>
             </div>
           </div>
         </div>
@@ -1947,57 +1985,6 @@
       }));
     }
 
-    bindSwitcher('#switchTabs .switch-tab', {
-      attr: 'switch',
-      containerId: 'visualStack',
-      title: document.getElementById('switchTitle'),
-      badge: document.getElementById('switchBadge'),
-      copy: document.getElementById('switchCopy'),
-      grid: document.getElementById('switchGrid'),
-      data: {
-        problem: {
-          title: 'Problem', badge: 'Broken trust', badgeClass: 'red',
-          copy: 'Traditional audit workflows end in static documents. AuditChain turns that broken flow into a living trust system.',
-          cards: [
-            { title: 'PDF reports', text: 'Editable, email-based, and hard to verify.' },
-            { title: 'Slow delivery', text: 'Manual review creates long wait times.' },
-            { title: 'Hidden proof', text: 'Most reports live inside private servers.' },
-            { title: 'Lost confidence', text: 'Users cannot independently prove authenticity.' }
-          ]
-        },
-        analysis: {
-          title: 'Analysis', badge: 'AI review', badgeClass: 'blue',
-          copy: 'The contract is inspected line by line. Findings appear as discoveries, not as a wall of text.',
-          cards: [
-            { title: 'Vulnerability detection', text: 'Reentrancy, access control, call handling, and more.' },
-            { title: 'Severity scoring', text: 'Findings are ranked from low to critical.' },
-            { title: 'Suggested fixes', text: 'The system proposes safer code patterns.' },
-            { title: 'Readable output', text: 'The report is structured for real developers.' }
-          ]
-        },
-        storage: {
-          title: 'Storage', badge: 'Pinned', badgeClass: 'blue',
-          copy: 'The report is pinned to IPFS and anchored on Ethereum. The record becomes public, permanent, and easy to retrieve later.',
-          cards: [
-            { title: 'IPFS CID', text: 'Content-addressed storage for the full report.' },
-            { title: 'Ethereum hash', text: 'On-chain anchoring gives the proof permanence.' },
-            { title: 'Public record', text: 'Anyone can inspect the trail independently.' },
-            { title: 'No private lock-in', text: 'The record does not depend on one server.' }
-          ]
-        },
-        verification: {
-          title: 'Verification', badge: 'Visible trust', badgeClass: 'green',
-          copy: 'Verification is the final pulse. The interface calmly confirms whether the report hash matches the on-chain record.',
-          cards: [
-            { title: 'Tx hash lookup', text: 'One identifier is enough to recover the proof.' },
-            { title: 'Event decoding', text: 'The backend reads the AuditStored log.' },
-            { title: 'Hash comparison', text: 'Stored and decoded hashes are compared.' },
-            { title: 'Green confirmation', text: 'The interface visibly shifts into a verified state.' }
-          ]
-        }
-      }
-    });
-
     bindSwitcher('#howTabs .switch-tab', {
       attr: 'how',
       containerId: 'visualStackHow',
@@ -2538,6 +2525,95 @@
       apply(0);
       requestAnimationFrame(frame);
     }
+  })();
+  </script>
+
+  <!-- ════ Interactive Trust scroll-stack (sticky pinned card sequence) ════ -->
+  <script>
+  (function () {
+    'use strict';
+    var reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    var clamp = function (v, a, b) { return Math.min(b, Math.max(a, v)); };
+    function pw(p, stops, vals) {
+      if (p <= stops[0]) return vals[0];
+      for (var i = 1; i < stops.length; i++) {
+        if (p <= stops[i]) {
+          var t = (p - stops[i - 1]) / (stops[i] - stops[i - 1]);
+          return vals[i - 1] + (vals[i] - vals[i - 1]) * t;
+        }
+      }
+      return vals[vals.length - 1];
+    }
+
+    var track = document.getElementById('storyTrack');
+    if (!track) return;
+    var stack = document.getElementById('storyStack');
+    var cards = Array.prototype.slice.call(document.querySelectorAll('.story-card'));
+    if (reduced || cards.length < 2) return;
+
+    var TOP = 88;
+    var EXTRA = window.innerHeight * 1.8;
+    var ENTER = [null, [.16, .32], [.44, .60], [.72, .88]];
+
+    function depthOpacity(d) { return pw(d, [0, 1, 2, 3], [1, .55, .32, .18]); }
+    function depthScale(d) { return pw(d, [0, 1, 2, 3], [1, .96, .92, .89]); }
+    function depthBlur(d) { return pw(d, [0, 1, 2, 3], [0, 4, 8, 11]); }
+    function depthTY(d) { return pw(d, [0, 1, 2, 3], [0, -10, -18, -24]); }
+    function depthBright(d) { return pw(d, [0, 1, 2, 3], [1.04, 1, .97, .94]); }
+
+    function layout() {
+      var h = 0;
+      cards.forEach(function (c) {
+        c.style.position = 'static';
+        c.style.height = 'auto';
+        h = Math.max(h, c.scrollHeight);
+        c.style.position = 'absolute';
+      });
+      stack.style.height = h + 'px';
+      EXTRA = window.innerHeight * 1.8;
+      track.style.height = (h + EXTRA) + 'px';
+    }
+
+    function entered(i, p) {
+      if (i === 0) return 1;
+      return pw(p, ENTER[i], [0, 1]);
+    }
+
+    function apply(p) {
+      var e = [entered(0, p), entered(1, p), entered(2, p), entered(3, p)];
+      for (var i = 0; i < cards.length; i++) {
+        var d = 0;
+        for (var j = i + 1; j < cards.length; j++) d += e[j];
+        var op = e[i] * depthOpacity(d);
+        var sc = pw(e[i], [0, 1], [.92, depthScale(d)]);
+        var bl = pw(e[i], [0, 1], [6, depthBlur(d)]);
+        var ty = pw(e[i], [0, 1], [70, depthTY(d)]);
+        var br = pw(e[i], [0, 1], [1, depthBright(d)]);
+        var card = cards[i];
+        card.style.opacity = op;
+        card.style.transform = 'translateY(' + ty.toFixed(2) + 'px) scale(' + sc.toFixed(4) + ')';
+        card.style.filter = 'blur(' + bl.toFixed(2) + 'px) brightness(' + br.toFixed(3) + ')';
+        var entering = i > 0 && p >= ENTER[i][0] && p < ENTER[i][1];
+        card.style.zIndex = entering ? (200 + i) : (50 - Math.round(d) * 10);
+        card.classList.toggle('is-active', !entering && d < .5 && e[i] > .5);
+      }
+    }
+
+    var cur = 0;
+    function frame() {
+      var r = track.getBoundingClientRect();
+      var target = clamp((TOP - r.top) / EXTRA, 0, 1);
+      if (Math.abs(target - cur) > .35) cur = target;
+      cur += (target - cur) * .16;
+      if (Math.abs(target - cur) < .0004) cur = target;
+      apply(cur);
+      requestAnimationFrame(frame);
+    }
+
+    layout();
+    apply(0);
+    requestAnimationFrame(frame);
+    window.addEventListener('resize', layout);
   })();
   </script>
 </body>
