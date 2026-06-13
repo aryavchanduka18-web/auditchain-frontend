@@ -544,6 +544,7 @@
       border:1px solid rgba(255,255,255,.08); background:rgba(255,255,255,.05);
       color:var(--muted); font-size:.78rem; font-weight:600;
     }
+    .surface-card .badge { margin-bottom:14px; }
     .badge.green { color: var(--green); }
     .badge.blue { color: var(--blue); }
     .badge.orange { color: var(--orange); }
@@ -624,7 +625,7 @@
     .problem-icon { width:52px; height:52px; border-radius:16px; display:grid; place-items:center; background:rgba(41,124,255,.08); border:1px solid rgba(41,124,255,.15); color:rgba(100,175,255,.85); flex-shrink:0; }
     .problem-card h3, .step-card h3, .about-card h3, .surface-card h3 { margin:0; font-size:1.35rem; letter-spacing:-.05em; line-height:1.12; }
     .problem-card p, .about-card p, .surface-card p { margin:10px 0 0; color:var(--muted); font-size:1rem; line-height:1.72; }
-    .tag { display:inline-flex; align-self:flex-start; padding:8px 12px; border-radius:var(--radius-pill); background:rgba(255,91,91,.09); border:1px solid rgba(255,91,91,.16); color:#ff7a7a; font-size:.78rem; font-weight:700; }
+    .tag { display:inline-flex; align-self:flex-start; padding:8px 12px; border-radius:var(--radius-pill); background:rgba(255,91,91,.09); border:1px solid rgba(255,91,91,.16); color:#ff7a7a; font-size:.78rem; font-weight:700; margin-bottom:14px; }
 
     .timeline { display:grid; gap:16px; margin-top:16px; }
     .timeline-item {
@@ -697,7 +698,7 @@
       will-change:transform, opacity, filter;
     }
     .story-card[data-story="0"] { opacity:1; transform:none; filter:none; }
-    .story-card.is-active { box-shadow: 0 0 24px rgba(47,124,255,.22), var(--shadow-md); transition:box-shadow 420ms var(--ease); }
+    .story-card.is-active { box-shadow: var(--shadow-md); transition:box-shadow 420ms var(--ease); }
     @media (max-width:1100px) { .story-stack { max-width:620px; } }
 
     .surface-card {
@@ -762,7 +763,7 @@
     }
     .illustration-fetch .illus-network::after { left:30%; right:30%; top:36%; bottom:38%; }
     .illustration-verify .illus-check-ring {
-      position:absolute; left:28px; top:28px; width:74px; height:74px; border-radius:50%; border:1px solid rgba(51,226,122,.34);
+      position:absolute; left:28px; top:18px; width:74px; height:74px; border-radius:50%; border:1px solid rgba(51,226,122,.34);
       background:radial-gradient(circle, rgba(51,226,122,.14), rgba(51,226,122,.05)); display:grid; place-items:center; color:#8ff0b2; font-size:1.7rem; animation:pulse 1.8s infinite;
     }
     .illustration-verify .illus-check-ring::after { content:"✓"; font-weight:700; }
