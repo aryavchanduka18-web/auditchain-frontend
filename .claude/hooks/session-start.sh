@@ -9,3 +9,6 @@ if [ "${CLAUDE_CODE_REMOTE:-}" != "true" ]; then
 fi
 
 timeout 240 npx --yes claude-mem@latest install --provider claude --no-auto-start < /dev/null || true
+
+# Start the worker daemon so the MCP memory tools and observation hooks work.
+npx claude-mem start < /dev/null || true
